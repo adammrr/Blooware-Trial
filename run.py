@@ -5,9 +5,10 @@ from flask import Flask, render_template, request, flash, redirect, url_for
 from werkzeug.utils import secure_filename
 import cv2
 
-#Image Upload Configs.
+#CONFIGS
 UPLOAD_FOLDER = 'images'
 PERMITTED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+IMAGE_SCALE = 1.5
 
 #Flask Application Setup
 app = Flask(__name__)
@@ -57,9 +58,8 @@ def uploader():
             file.save(temp_target)
             img = cv2.imread(temp_target, cv2.IMREAD_UNCHANGED)
 
-            scale_percent = 150
-            width = int(img.shape[1] * scale_percent / 100)
-            height = int(img.shape[0] * scale_percent / 100)
+            width = int(img.shape[1] * IMAGE_SCALE)
+            height = int(img.shape[0] * IMAGE_SCALE)
             dim = (width, height)
 
             resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
