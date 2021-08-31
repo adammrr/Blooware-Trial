@@ -6,15 +6,19 @@ from werkzeug.utils import secure_filename
 import cv2
 
 #CONFIGS
-UPLOAD_FOLDER = 'images'
+UPLOAD_FOLDER = 'static\images'
 PERMITTED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 IMAGE_SCALE = 1.5
 
 #Flask Application Setup
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="", static_folder="static")
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.secret_key = "Blooware is quite amazing :)"
+
+#DIRECTORIES
+ORIGINAL_IMAGES = os.path.join(app.config['UPLOAD_FOLDER'],"original")
+MODIFIED_IMAGES = os.path.join(app.config['UPLOAD_FOLDER'],"modified")
 
 #Flask Routing - Definition of pages and execution
 @app.route("/")
@@ -23,9 +27,10 @@ def index():
 
 @app.route("/images")
 def images():
-    images = os.path.listdir('static/images')
-    print(os.path.listdir('static/images'))
-    return render_template('images.html', images = images)
+    modified_images = os.listdir(MODIFIED_IMAGES);
+
+    #modified_images = ['images/modified/' + file for file in modified_images]
+    return render_template('images.html', modified_images=modified_images)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -47,14 +52,14 @@ def uploader():
             check = True
             counter = 0
             while check:
-                filename =  "original_" + str(counter) + "_" + file.filename
-                file_to_check = os.path.join(app.config['UPLOAD_FOLDER'],"original", secure_filename(filename))
+                filename = str(counter) + "_" + file.filename
+                file_to_check = os.path.join(ORIGINAL_IMAGES, secure_filename(filename))
                 if os.path.exists(file_to_check):
                     counter = counter + 1
                 else:
                     check = False
 
-            temp_target = os.path.join(app.config['UPLOAD_FOLDER'],"original", secure_filename(filename))
+            temp_target = os.path.join(ORIGINAL_IMAGES, secure_filename(filename))
             file.save(temp_target)
             img = cv2.imread(temp_target, cv2.IMREAD_UNCHANGED)
 
@@ -63,11 +68,11 @@ def uploader():
             dim = (width, height)
 
             resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
-            filename = "modified_" + str(counter) + "_" + file.filename
-            target = os.path.join(app.config['UPLOAD_FOLDER'],"modified", secure_filename(filename))
+            filename = str(counter) + "_" + file.filename
+            target = os.path.join(MODIFIED_IMAGES, secure_filename(filename))
             cv2.imwrite(target, resized)
-            flash("Your image is located at " + str(target))
-        return render_template('images.html')
+            flash(str(filename))
+        return redirect(url_for("images"))
     else:
         flash("Please use this form to upload images.")
         return redirect(url_for("index"))
