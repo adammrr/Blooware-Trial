@@ -1,0 +1,14 @@
+<html>
+
+<body>
+    <h1>Blooware Trial</h1>
+    <h4><a href="/">Return to upload</a></h4>
+    <hr>
+    <p>Here are the previously uploaded images.</p>
+    {% for mesg in get_flashed_messages() %}
+      <h3 style="color:blue;">{{ mesg }}</h3>
+      {% endfor %}
+
+</body>
+
+</html>

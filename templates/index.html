@@ -1,0 +1,18 @@
+<html>
+
+<body>
+    <h1>Blooware Trial</h1>
+    <p>The following form allows you to upload an image, it will be upscaled by 50% and saved with a unique name in <b><i>/images/modified/</i></b></p>
+
+    <a href="images">Click here to view previously uploaded images</a>
+    <hr>
+    <form action="image_upload" method="POST" enctype = "multipart/form-data">
+      <input type="file" name="image_file"/>
+      <input type="submit" value="Upload Image"/>
+    </form>
+    {% for mesg in get_flashed_messages() %}
+      <h3 style="color:red;">{{ mesg }}</h3>
+      {% endfor %}
+</body>
+
+</html>
